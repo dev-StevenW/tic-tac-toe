@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tic-Tac-Toe</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="playerSelect" id="playerSelect">
+      <div type="button" id="singlePlayer" class="player-button">
+        Single Player
+      </div>
+      <div type="button" id="twoPlayer" class="player-button">Two Player</div>
+    </div>
+    <div id="playerEntry" class="playerSelect playerEntry hidden">
+      <div>
+        <label for="playerOneInput">Player One:</label>
+        <input
+          type="text"
+          name="playerOneInput"
+          id="playerOneInput"
+          placeholder="Enter name"
+        />
+      </div>
+      <div>
+        <label for="playerTwoInput">Player Two:</label>
+        <input
+          type="text"
+          name="playerTwoInput"
+          id="playerTwoInput"
+          placeholder="Enter name"
+        />
+      </div>
+      <button class="button" id="submitPlayers">Start Game</button>
+    </div>
+    <div class="board hidden">
+      <div class="row" data-row="0">
+        <div data-square="0" class="square"></div>
+        <div data-square="1" class="square"></div>
+        <div data-square="2" class="square"></div>
+      </div>
+      <div class="row" data-row="1">
+        <div data-square="0" class="square"></div>
+        <div data-square="1" class="square"></div>
+        <div data-square="2" class="square"></div>
+      </div>
+      <div class="row" data-row="2">
+        <div data-square="0" class="square"></div>
+        <div data-square="1" class="square"></div>
+        <div data-square="2" class="square"></div>
+      </div>
+      <button id="reset" class="reset">Reset</button>
+    </div>
+    <div id="gameEnd"></div>
+
+    <script src="app.js"></script>
+  </body>
+</html>
