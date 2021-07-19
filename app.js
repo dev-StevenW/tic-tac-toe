@@ -14,14 +14,10 @@ const gameBoard = (() => {
 
   const switchPlayer = () => {
     currentPlayer.one = !currentPlayer.one;
+    displayController.switchPlayer();
   };
 
-  //Add move to array
-  const addMoveToArray = (x, y) => {
-    currentPlayer.one ? (board[y][x] = 1) : (board[y][x] = 2);
-  };
-
-  //Add move to array and document
+  //Check if square is taken, if not add move to array and dom
   const addMove = (e) => {
     if (winningPlayer) return;
     const x = e.target.dataset.square;
@@ -29,17 +25,35 @@ const gameBoard = (() => {
     if (board[y][x] === 1 || board[y][x] === 2) return;
     addMoveToArray(x, y);
     displayController.updateMove(x, y);
-    switchPlayer();
     isGameOver();
+    if (!winningPlayer) switchPlayer();
   };
+
+  //Add move to array
+  const addMoveToArray = (x, y) => {
+    currentPlayer.one ? (board[y][x] = 1) : (board[y][x] = 2);
+  };
+
   //Clear Game Board
   const reset = () => {
     board.map((row) => row.splice(0, 3));
     displayController.resetBoard();
     gameEnd.innerText = "";
-    winningPlayer = 0;
+    if (winningPlayer) {
+      winningPlayer = 0;
+      switchPlayer();
+    }
   };
 
+  //End game conditions
+  const isGameOver = () => {
+    checkRows();
+    checkColumns();
+    checkDiagonals();
+    if (!winningPlayer) isBoardFull();
+  };
+
+  //Check each row for win
   const checkRows = () => {
     board.forEach((row, i) => {
       if (row.length < 3) return;
@@ -50,6 +64,7 @@ const gameBoard = (() => {
     });
   };
 
+  //Check each column for win
   const checkColumns = () => {
     board.forEach((row, i) => {
       if (!board[0][i]) return;
@@ -62,6 +77,7 @@ const gameBoard = (() => {
     });
   };
 
+  //Check diagonal lines for win
   const checkDiagonals = () => {
     if (board[0][0]) {
       if (board[0][0] === board[1][1] && board[0][0] === board[2][2]) {
@@ -81,9 +97,12 @@ const gameBoard = (() => {
     }
   };
 
+  //Check if the game ends in a tie
   const isBoardFull = () => {
-    if (board[0].length === 3 && board[1].length === 3 && board[2].length === 3)
-      tie();
+    let row1 = board[0].filter((square) => (square > 0 ? true : false));
+    let row2 = board[1].filter((square) => (square > 0 ? true : false));
+    let row3 = board[2].filter((square) => (square > 0 ? true : false));
+    if (row1.length === 3 && row2.length === 3 && row3.length === 3) tie();
   };
 
   const tie = () => {
@@ -91,13 +110,7 @@ const gameBoard = (() => {
     winner("Tie");
   };
 
-  const isGameOver = () => {
-    checkRows();
-    checkColumns();
-    checkDiagonals();
-    if (!winningPlayer) isBoardFull();
-  };
-
+  //If win or tie, send info to display controller for dom manipulation
   const winner = (winningPlayer, direction, winLine) => {
     displayController.endGame(winningPlayer, direction, winLine);
   };
@@ -106,6 +119,23 @@ const gameBoard = (() => {
 })();
 
 const displayController = (() => {
+  //Reveal Board
+  const revealBoard = () => {
+    playerEntry.classList.toggle("hidden");
+    gameBoardElement.classList.toggle("hidden");
+    playerOneDisplay.innerText = `${playerOne.name}: ${playerOne.marker}`;
+    playerTwoDisplay.innerText = `${playerTwo.name}: ${playerTwo.marker}`;
+    playerDisplay.classList.toggle("hidden");
+  };
+
+  //Two Player Game
+  const twoPlayerSelect = () => {
+    const buttons = document.querySelector("#playerSelect", ".playerSelect");
+    buttons.classList.toggle("hidden");
+    playerEntry.classList.toggle("hidden");
+    typewriter.classList.toggle("typewriter");
+  };
+
   //Adds move to document
   const updateMove = (x, y) => {
     const row = document.querySelector(`div[data-row="${y}"]`);
@@ -115,6 +145,11 @@ const displayController = (() => {
       : (square.innerText = playerTwo.marker);
   };
 
+  //Switch player on display
+  const switchPlayer = () => {
+    playerOneWrap.classList.toggle("highlighted");
+    playerTwoWrap.classList.toggle("highlighted");
+  };
   //Clears Board
   const resetBoard = () => {
     squares.forEach((square) => {
@@ -123,8 +158,13 @@ const displayController = (() => {
     });
   };
 
+  const addScore = (winningPlayer) => (winningPlayer.score += 1);
+
   const endGame = (winningPlayer, direction, winLine) => {
     displayWinner(winningPlayer, direction, winLine);
+    addScore(winningPlayer);
+    playerOneScore.innerText = `Score: ${playerOne.score}`;
+    playerTwoScore.innerText = `Score: ${playerTwo.score}`;
   };
 
   const displayWinner = (winningPlayer, direction, winLine) => {
@@ -150,30 +190,24 @@ const displayController = (() => {
     gameEnd.innerText = `${winningPlayer.name} Wins`;
   };
 
-  //Reveal Board
-
-  const revealBoard = () => {
-    playerEntry.classList.toggle("hidden");
-    gameBoardElement.classList.toggle("hidden");
+  return {
+    switchPlayer,
+    endGame,
+    revealBoard,
+    twoPlayerSelect,
+    resetBoard,
+    updateMove,
   };
-
-  //Two Player Game
-  const twoPlayerSelect = () => {
-    const buttons = document.querySelector("#playerSelect", ".playerSelect");
-    buttons.classList.toggle("hidden");
-    playerEntry.classList.toggle("hidden");
-  };
-  return { endGame, revealBoard, twoPlayerSelect, resetBoard, updateMove };
 })();
 
 const players = (() => {
   const playerFactory = (name, marker) => {
-    return { name, marker };
+    return { name, marker, score: 0 };
   };
 
   const playerFactoryExecute = () => {
-    const playerOneName = playerOneInput.value || "player one";
-    const playerTwoName = playerTwoInput.value || "player two";
+    const playerOneName = playerOneInput.value || "Player One";
+    const playerTwoName = playerTwoInput.value || "Player Two";
     playerOne = playerFactory(playerOneName, "X");
     playerTwo = playerFactory(playerTwoName, "O");
   };
@@ -182,32 +216,36 @@ const players = (() => {
     playerFactoryExecute();
     displayController.revealBoard();
   };
+
   return { createPlayers };
 })();
 
-//Click listeners
-const squares = document.querySelectorAll(".square");
-squares.forEach((square) =>
-  square.addEventListener("click", gameBoard.addMove)
-);
-
+//Selectors
+const gameBoardElement = document.querySelector(".board");
 const gameEnd = document.querySelector("#gameEnd");
+const squares = document.querySelectorAll(".square");
+const diagonalOne = document.querySelectorAll(`[data-diagonalOne]`);
+const diagonalTwo = document.querySelectorAll(`[data-diagonalTwo]`);
 const resetButton = document.querySelector("#reset");
-resetButton.addEventListener("click", gameBoard.reset);
-
 const singlePlayer = document.querySelector("#singlePlayer");
 const twoPlayer = document.querySelector("#twoPlayer");
-const gameBoardElement = document.querySelector(".board");
 const playerEntry = document.querySelector("#playerEntry");
 const playerOneInput = document.querySelector("#playerOneInput");
 const playerTwoInput = document.querySelector("#playerTwoInput");
-const diagonalOne = document.querySelectorAll(`[data-diagonalOne]`);
-const diagonalTwo = document.querySelectorAll(`[data-diagonalTwo]`);
 const submitPlayers = document.querySelector("#submitPlayers");
+const playerDisplay = document.querySelector("#playerDisplay");
+const playerOneWrap = document.querySelector("#playerOneWrap");
+const playerOneDisplay = document.querySelector("#playerOneDisplay");
+const playerOneScore = document.querySelector("#playerOneScore");
+const playerTwoWrap = document.querySelector("#playerTwoWrap");
+const playerTwoDisplay = document.querySelector("#playerTwoDisplay");
+const playerTwoScore = document.querySelector("#playerTwoScore");
+const typewriter = document.querySelector("#typewriter");
+
+//Click listeners
+squares.forEach((square) =>
+  square.addEventListener("click", gameBoard.addMove)
+);
+resetButton.addEventListener("click", gameBoard.reset);
 submitPlayers.addEventListener("click", players.createPlayers);
-
 twoPlayer.addEventListener("click", displayController.twoPlayerSelect);
-
-/* const steven = playerFactory("steven", "X");
-const olivia = playerFactory("olivia", "O");
- */

@@ -8,34 +8,49 @@
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <div class="playerSelect" id="playerSelect">
-      <div type="button" id="singlePlayer" class="player-button">
-        Single Player
-      </div>
-      <div type="button" id="twoPlayer" class="player-button">Two Player</div>
+    <div id="typewriter" class="typewriter">
+      <h1 class="">Tic_Tac_Toe</h1>
     </div>
-    <div id="playerEntry" class="playerSelect playerEntry hidden">
-      <div>
-        <label for="playerOneInput">Player One:</label>
-        <input
-          type="text"
-          name="playerOneInput"
-          id="playerOneInput"
-          placeholder="Enter name"
-        />
+
+    <div class="display-wrap">
+      <div class="playerSelect" id="playerSelect">
+        <div type="button" id="singlePlayer" class="button player-button">
+          One Player
+        </div>
+        <div type="button" id="twoPlayer" class="button player-button">
+          Two Player
+        </div>
       </div>
-      <div>
-        <label for="playerTwoInput">Player Two:</label>
-        <input
-          type="text"
-          name="playerTwoInput"
-          id="playerTwoInput"
-          placeholder="Enter name"
-        />
+      <div id="playerEntry" class="playerSelect playerEntry hidden">
+        <div class="inputs-wrap">
+          <div>
+            <label for="playerOneInput">Player One:</label>
+            <input
+              type="text"
+              name="playerOneInput"
+              id="playerOneInput"
+              placeholder="Enter name"
+            />
+          </div>
+          <div>
+            <label for="playerTwoInput">Player Two:</label>
+            <input
+              type="text"
+              name="playerTwoInput"
+              id="playerTwoInput"
+              placeholder="Enter name"
+            />
+          </div>
+        </div>
+        <div class="button player-button" type="button" id="submitPlayers">
+          Start Game
+        </div>
       </div>
-      <button class="button" id="submitPlayers">Start Game</button>
+ 
+      </div>
     </div>
     <div class="board hidden">
+       <div id="gameEnd"></div>
       <div class="row" data-row="0">
         <div
           data-row="0"
@@ -77,9 +92,21 @@
           class="square"
         ></div>
       </div>
-      <button id="reset" class="reset">Reset</button>
+      
     </div>
-    <div id="gameEnd"></div>
+    <div class="playerDisplay hidden" id="playerDisplay">
+      <div id="playerOneWrap" class="player-display highlighted">
+        <div id="playerOneDisplay" class="playerInfo "></div>
+        <div id="playerOneScore" class="playerInfoScore">Score: 0</div>
+      </div>
+      <div id="reset" class="button reset">Reset</div>
+      <div id="playerTwoWrap"class="player-display">
+        <div id="playerTwoDisplay" class="playerInfo"></div>
+        <div id="playerTwoScore" class=" playerInfoScore">Score: 0</div>
+         
+        </div>
+      </div>
+   
 
     <script src="app.js"></script>
   </body>
