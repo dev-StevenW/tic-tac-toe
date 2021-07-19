@@ -37,19 +37,45 @@
     </div>
     <div class="board hidden">
       <div class="row" data-row="0">
-        <div data-square="0" class="square"></div>
-        <div data-square="1" class="square"></div>
-        <div data-square="2" class="square"></div>
+        <div
+          data-row="0"
+          data-square="0"
+          data-diagonalOne="1"
+          class="square"
+        ></div>
+        <div data-row="0" data-square="1" class="square"></div>
+        <div
+          data-row="0"
+          data-square="2"
+          data-diagonalTwo="1"
+          class="square"
+        ></div>
       </div>
       <div class="row" data-row="1">
-        <div data-square="0" class="square"></div>
-        <div data-square="1" class="square"></div>
-        <div data-square="2" class="square"></div>
+        <div data-row="1" data-square="0" class="square"></div>
+        <div
+          data-row="1"
+          data-square="1"
+          data-diagonalTwo="1"
+          data-diagonalOne="1"
+          class="square"
+        ></div>
+        <div data-row="1" data-square="2" class="square"></div>
       </div>
       <div class="row" data-row="2">
-        <div data-square="0" class="square"></div>
-        <div data-square="1" class="square"></div>
-        <div data-square="2" class="square"></div>
+        <div
+          data-row="2"
+          data-square="0"
+          data-diagonalTwo="1"
+          class="square"
+        ></div>
+        <div data-row="2" data-square="1" class="square"></div>
+        <div
+          data-row="2"
+          data-diagonalOne="1"
+          data-square="2"
+          class="square"
+        ></div>
       </div>
       <button id="reset" class="reset">Reset</button>
     </div>

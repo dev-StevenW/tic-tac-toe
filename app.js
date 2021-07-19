@@ -10,6 +10,8 @@ const gameBoard = (() => {
 
   const currentPlayer = { one: true };
 
+  let winningPlayer;
+
   const switchPlayer = () => {
     currentPlayer.one = !currentPlayer.one;
   };
@@ -21,6 +23,7 @@ const gameBoard = (() => {
 
   //Add move to array and document
   const addMove = (e) => {
+    if (winningPlayer) return;
     const x = e.target.dataset.square;
     const y = e.target.parentElement.dataset.row;
     if (board[y][x] === 1 || board[y][x] === 2) return;
@@ -34,38 +37,69 @@ const gameBoard = (() => {
     board.map((row) => row.splice(0, 3));
     displayController.resetBoard();
     gameEnd.innerText = "";
+    winningPlayer = 0;
   };
 
   const checkRows = () => {
-    board.forEach((row) => {
+    board.forEach((row, i) => {
       if (row.length < 3) return;
-      if (row[0] === row[1] && row[0] === row[2]) console.log("Winner ROW");
+      if (row[0] === row[1] && row[0] === row[2]) {
+        row[0] == 1 ? (winningPlayer = playerOne) : (winningPlayer = playerTwo);
+        winner(winningPlayer, "row", i);
+      }
     });
   };
 
   const checkColumns = () => {
     board.forEach((row, i) => {
       if (!board[0][i]) return;
-      if (board[0][i] === board[1][i] && board[0][i] === board[2][i])
-        console.log("Winner COLUM");
+      if (board[0][i] === board[1][i] && board[0][i] === board[2][i]) {
+        board[0][i] == 1
+          ? (winningPlayer = playerOne)
+          : (winningPlayer = playerTwo);
+        winner(winningPlayer, "column", i);
+      }
     });
   };
 
   const checkDiagonals = () => {
     if (board[0][0]) {
-      if (board[0][0] === board[1][1] && board[0][0] === board[2][2])
-        console.log("Winner Diagonal 1");
+      if (board[0][0] === board[1][1] && board[0][0] === board[2][2]) {
+        board[0][0] == 1
+          ? (winningPlayer = playerOne)
+          : (winningPlayer = playerTwo);
+        winner(winningPlayer, "diagonal", "downAndRight");
+      }
     }
     if (board[2][0]) {
-      if (board[2][0] === board[1][1] && board[2][0] === board[0][2])
-        console.log("Winner diagonal");
+      if (board[2][0] === board[1][1] && board[2][0] === board[0][2]) {
+        board[2][0] == 1
+          ? (winningPlayer = playerOne)
+          : (winningPlayer = playerTwo);
+        winner(winningPlayer, "diagonal", "upAndRight");
+      }
     }
+  };
+
+  const isBoardFull = () => {
+    if (board[0].length === 3 && board[1].length === 3 && board[2].length === 3)
+      tie();
+  };
+
+  const tie = () => {
+    winningPlayer = "";
+    winner("Tie");
   };
 
   const isGameOver = () => {
     checkRows();
     checkColumns();
     checkDiagonals();
+    if (!winningPlayer) isBoardFull();
+  };
+
+  const winner = (winningPlayer, direction, winLine) => {
+    displayController.endGame(winningPlayer, direction, winLine);
   };
 
   return { board, currentPlayer, reset, addMove };
@@ -83,10 +117,37 @@ const displayController = (() => {
 
   //Clears Board
   const resetBoard = () => {
-    const squares = document.querySelectorAll(".square");
     squares.forEach((square) => {
       square.innerText = "";
+      square.classList.remove("win");
     });
+  };
+
+  const endGame = (winningPlayer, direction, winLine) => {
+    displayWinner(winningPlayer, direction, winLine);
+  };
+
+  const displayWinner = (winningPlayer, direction, winLine) => {
+    if (direction === "row") {
+      squares.forEach((square) => {
+        if (square.dataset.row == winLine) square.classList.toggle("win");
+      });
+    }
+    if (direction === "column") {
+      squares.forEach((square) => {
+        if (square.dataset.square == winLine) square.classList.toggle("win");
+      });
+    }
+    if (direction === "diagonal") {
+      if (winLine == "downAndRight") {
+        diagonalOne.forEach((square) => square.classList.toggle("win"));
+      }
+      if (winLine == "upAndRight") {
+        diagonalTwo.forEach((square) => square.classList.toggle("win"));
+      }
+    }
+    if (winningPlayer === "Tie") return (gameEnd.innerText = "Tie Game");
+    gameEnd.innerText = `${winningPlayer.name} Wins`;
   };
 
   //Reveal Board
@@ -102,7 +163,7 @@ const displayController = (() => {
     buttons.classList.toggle("hidden");
     playerEntry.classList.toggle("hidden");
   };
-  return { revealBoard, twoPlayerSelect, resetBoard, updateMove };
+  return { endGame, revealBoard, twoPlayerSelect, resetBoard, updateMove };
 })();
 
 const players = (() => {
@@ -125,8 +186,10 @@ const players = (() => {
 })();
 
 //Click listeners
-const rows = document.querySelectorAll(".square");
-rows.forEach((row) => row.addEventListener("click", gameBoard.addMove));
+const squares = document.querySelectorAll(".square");
+squares.forEach((square) =>
+  square.addEventListener("click", gameBoard.addMove)
+);
 
 const gameEnd = document.querySelector("#gameEnd");
 const resetButton = document.querySelector("#reset");
@@ -138,7 +201,8 @@ const gameBoardElement = document.querySelector(".board");
 const playerEntry = document.querySelector("#playerEntry");
 const playerOneInput = document.querySelector("#playerOneInput");
 const playerTwoInput = document.querySelector("#playerTwoInput");
-
+const diagonalOne = document.querySelectorAll(`[data-diagonalOne]`);
+const diagonalTwo = document.querySelectorAll(`[data-diagonalTwo]`);
 const submitPlayers = document.querySelector("#submitPlayers");
 submitPlayers.addEventListener("click", players.createPlayers);
 
